@@ -1,0 +1,384 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<title>클로즈유어아이즈 가사 소트</title>
+<script type="text/javascript">
+<!--
+//*********************************************************
+//
+// ?価するメンバ?の名前のリスト
+//
+// この部分を変更して下さい。名前の削除・追加も可?です。
+// 名前を引用符(")で括り、コン?(,)で区切って下さい。
+// 但し、リストの最後にはコン?を入れてはいけません。
+//
+//*********************************************************
+var namMember = new Array(
+
+"<img src=> <br>순간은 사라져도 영원은 잠들지 않아</br>",
+"<img src=> <br>너의 하루 끝 어딘가 네 한숨을 찾아가</br>",
+"<img src=> <br>너를 담은 이 영화에 나의 가사가 자막이 돼</br>",
+"<img src=> <br>모든 빛이 너를 향한 채</br>",
+"<img src=> <br>몇 번을 되뇌었던 선율 그건 너의 이름</br>",
+"<img src=> <br>네 존재만으로</br>",
+"<img src=> <br>최초의 말은 '사랑해'였을지 몰라</br>",
+"<img src=> <br>나만의 빗속에서 춤추는 법 그저 Dive in now 두려울 건 없어</br>",
+"<img src=> <br>흐려진 마음속 잿빛도 은빛이 될 거라 믿지</br>",
+"<img src=> <br>분위기를 핫하게, 달궈놓고 딴짓 네가 나를 향해 움직일 때까지</br>",
+"<img src=> <br>짙은 어둠 번지더라도 날 감싸줄 그늘이라고</br>",
+"<img src=> <br>너 밖엔 더 기댈 곳이 없는걸</br>",
+"<img src=> <br>너란 존재 그저 이끌리게 돼 새로운 법칙 우주의 중심</br>",
+"<img src=> <br>그저 쉽게 삼키긴 아쉬워질 테니</br>",
+"<img src=> <br>작은 글씨로 몰래 적어본 ‘I love you’</br>",
+"<img src=> <br>좋아해 옆에다 쓰고픈 한 글자 You</br>",
+"<img src=> <br>하루가 온통 너로만 채워져</br>",
+"<img src=> <br>제일 평범한 일상이 특별해지지 </br>",
+"<img src=> <br>오직 나만의 맘을 따르지</br>",
+"<img src=> <br>내가 딛는 모든 곳이 출발선</br>",
+"<img src=> <br>무엇도 닮지 않은 게 좋아</br>",
+"<img src=> <br>벽장이나 침대 밑 또는 네 맘 깊숙이 나를 새겨둘 테니</br>",
+"<img src=> <br>널 위해 설계돼</br>",
+"<img src=> <br>날 데려가 너의 비밀 너머까지</br>",
+"<img src=> <br>버릇처럼 널 향해 멈춰진 시선 끝에서</br>",
+"<img src=> <br>난 우리가 이 시간에 갇혀 있길 영원토록</br>",
+"<img src=> <br>전부 바꿀 수 있다고 널 위해 네게 약속해</br>",
+"<img src=> <br>We all came 같은 곳에 Assemble 7 project</br>",
+"<img src=> <br>나는 자유롭게 걸어가 휘청거리는 바람처럼</br>",
+"<img src=> <br>오래 유영하고 싶어 멀어져 가는 초침 속을 헤매이는 지금</br>",
+"<img src=> <br>너에게 날 던져 bleeding through</br>",
+"<img src=> <br>너의 눈에 잠긴 이 순간 I know 사라져도 좋아 이 순간 Uh</br>",
+"<img src=> <br>떨어지는 너에게 잠겨 죽어도 좋아</br>",
+"<img src=> <br>찬란한 너에게 잠겨 번져도 좋아</br>",
+"<img src=> <br>안녕, 그 한마디 내 하룰 지워 버렸어</br>",
+"<img src=> <br>온종일 너 생각뿐 바보가 된 듯 고장 나 버렸나</br>",
+"<img src=> <br>난 네 앞에만 서면 떨려서 금세 또 얼음</br>",
+"<img src=> <br>뭐가 필요해 지금 이 순간 우린</br>",
+"<img src=> <br>말해 주고 싶어 웃게 하고 싶어 널</br>",
+"<img src=> <br>영원에 살게 해</br>",
+"<img src=> <br>두 눈을 감으면 내게로 달려와</br>",
+"<img src=> <br>너의 곁에 영원히 수없이 계절이 가고 모든 게 희미해져도</br>",
+
+);
+//*********************************************************
+
+var lstMember = new Array();
+var parent = new Array();
+var equal = new Array();
+var rec = new Array();
+var cmp1,cmp2;
+var head1,head2;
+var nrec;
+
+var numQuestion;
+var totalSize;
+var finishSize;
+var finishFlag;
+
+//変数の初期化+++++++++++++++++++++++++++++++++++++++++++++
+function initList(){
+var n = 0;
+var mid;
+var i;
+
+//??トすべき配列
+lstMember[n] = new Array();
+for (i=0; i<namMember.length; i++) {
+lstMember[n][i] = i;
+}
+parent[n] = -1;
+totalSize = 0;
+n++;
+
+for (i=0; i<lstMember.length; i++) {
+//要素数が２以上なら２分割し、
+//分割された配列をlstMemberの最後に加える
+if(lstMember[i].length>=2) {
+mid = Math.ceil(lstMember[i].length/2);
+lstMember[n] = new Array();
+lstMember[n] = lstMember[i].slice(0,mid);
+totalSize += lstMember[n].length;
+parent[n] = i;
+n++;
+lstMember[n] = new Array();
+lstMember[n] = lstMember[i].slice(mid,lstMember[i].length);
+totalSize += lstMember[n].length;
+parent[n] = i;
+n++;
+}
+}
+
+//保存用配列
+for (i=0; i<namMember.length; i++) {
+rec[i] = 0;
+}
+nrec = 0;
+
+//引き分けの結果を保存するリスト
+//キ?：リンク始?の値
+// 値 ：リンク終?の値
+for (i=0; i<=namMember.length; i++) {
+equal[i] = -1;
+}
+
+cmp1 = lstMember.length-2;
+cmp2 = lstMember.length-1;
+head1 = 0;
+head2 = 0;
+numQuestion = 1;
+finishSize = 0;
+finishFlag = 0;
+}
+
+//リストの??ト+++++++++++++++++++++++++++++++++++++++++++
+//flag：比較結果
+//  -1：左を選択
+//   0：引き分け
+//   1：右を選択
+function sortList(flag){
+var i;
+var str;
+
+//recに保存
+if (flag<0) {
+rec[nrec] = lstMember[cmp1][head1];
+head1++;
+nrec++;
+finishSize++;
+while (equal[rec[nrec-1]]!=-1) {
+rec[nrec] = lstMember[cmp1][head1];
+head1++;
+nrec++;
+finishSize++;
+}
+}
+else if (flag>0) {
+rec[nrec] = lstMember[cmp2][head2];
+head2++;
+nrec++;
+finishSize++;
+while (equal[rec[nrec-1]]!=-1) {
+rec[nrec] = lstMember[cmp2][head2];
+head2++;
+nrec++;
+finishSize++;
+}
+}
+else {
+rec[nrec] = lstMember[cmp1][head1];
+head1++;
+nrec++;
+finishSize++;
+while (equal[rec[nrec-1]]!=-1) {
+rec[nrec] = lstMember[cmp1][head1];
+head1++;
+nrec++;
+finishSize++;
+}
+equal[rec[nrec-1]] = lstMember[cmp2][head2];
+rec[nrec] = lstMember[cmp2][head2];
+head2++;
+nrec++;
+finishSize++;
+while (equal[rec[nrec-1]]!=-1) {
+rec[nrec] = lstMember[cmp2][head2];
+head2++;
+nrec++;
+finishSize++;
+}
+}
+
+//片方のリストを走査し終えた後の処理
+if (head1<lstMember[cmp1].length && head2==lstMember[cmp2].length) {
+//リストcmp2が走査済 - リストcmp1の残りをコピ?
+while (head1<lstMember[cmp1].length){
+rec[nrec] = lstMember[cmp1][head1];
+head1++;
+nrec++;
+finishSize++;
+}
+}
+else if (head1==lstMember[cmp1].length && head2<lstMember[cmp2].length) {
+//リストcmp1が走査済 - リストcmp2の残りをコピ?
+while (head2<lstMember[cmp2].length){
+rec[nrec] = lstMember[cmp2][head2];
+head2++;
+nrec++;
+finishSize++;
+}
+}
+
+//両方のリストの最後に到達した場合は
+//親リストを更新する
+if (head1==lstMember[cmp1].length && head2==lstMember[cmp2].length) {
+for (i=0; i<lstMember[cmp1].length+lstMember[cmp2].length; i++) {
+lstMember[parent[cmp1]][i] = rec[i];
+}
+lstMember.pop();
+lstMember.pop();
+cmp1 = cmp1-2;
+cmp2 = cmp2-2;
+head1 = 0;
+head2 = 0;
+
+//新しい比較を行う前にrecを初期化
+if (head1==0 && head2==0) {
+for (i=0; i<namMember.length; i++) {
+rec[i] = 0;
+}
+nrec = 0;
+}
+}
+
+if (cmp1<0) {
+str = "Battle No."+(numQuestion-1)+"<br>"+Math.floor(finishSize*100/totalSize)+"% sorted.";
+document.getElementById("battleNumber").innerHTML = str;
+
+showResult();
+finishFlag = 1;
+}
+else {
+showImage();
+}
+}
+
+//結果の?示+++++++++++++++++++++++++++++++++++++++++++++++
+function showResult() {
+var ranking = 1;
+var sameRank = 1;
+var str = "";
+var i;
+
+str += "<table style=\"width:200px; font-size:12px; line-height:120%; margin-left:auto; margin-right:auto; border:1px solid #000; border-collapse:collapse\" align=\"center\">";
+str += "<tr><td style=\"color:#ffffff; background-color:#000; text-align:center;\">순위<\/td><td style=\"color:#ffffff; background-color:#000; text-align:center;\">이름<\/td><\/tr>";
+
+for (i=0; i<namMember.length; i++) {
+str += "<tr><td style=\"border:1px solid #000; text-align:right; padding-right:5px;\">"+ranking+"<\/td><td style=\"border:1px solid #000; padding-left:5px;\">"+namMember[lstMember[0][i]]+"<\/td><\/tr>";
+if (i<namMember.length-1) {
+if (equal[lstMember[0][i]]==lstMember[0][i+1]) {
+sameRank++;
+} else {
+ranking += sameRank;
+sameRank = 1;
+}
+}
+}
+str += "<\/table>";
+
+document.getElementById("resultField").innerHTML = str;
+}
+
+//比較する２つ要素の?示+++++++++++++++++++++++++++++++++++
+function showImage() {
+var str0 = "Battle No."+numQuestion+"<br>"+Math.floor(finishSize*100/totalSize)+"% sorted.";
+var str1 = ""+toNameFace(lstMember[cmp1][head1]);
+var str2 = ""+toNameFace(lstMember[cmp2][head2]);
+
+document.getElementById("battleNumber").innerHTML = str0;
+document.getElementById("leftField").innerHTML = str1;
+document.getElementById("rightField").innerHTML = str2;
+
+numQuestion++;
+}
+
+//数値を名前（顔文字）に変換+++++++++++++++++++++++++++++++
+function toNameFace(n){
+var str = namMember[n];
+
+//顔文字を追加する場合は以下のコメントアウトを外す
+//namMemberのインデックスと矛盾しないように注意
+/*
+str += "<br>────<br>";
+switch(n) {
+//case -1 はサンプルなので削除すること
+case -1: str+="（ ´∀｀）";break;
+default: str+=""+n;
+}
+*/
+return str;
+}
+//-->
+</script>
+<style type="text/css">
+<!--
+/**********************************************************
+
+ ?のス?イルを変更する場合はここを編集してください。
+
+**********************************************************/
+#mainTable{
+font-size: 12px;
+font-family: '돋움',sans-serif;
+text-align: center;
+vertical-align: middle;
+width: 410px;
+margin-left: auto;
+margin-right: auto;
+border-collapse: separate;
+border-spacing: 10px 5px;
+}
+#leftField{
+width: 120px;
+height: 150px;
+border: 1px solid #000;
+}
+#rightField{
+width: 120px;
+height: 150px;
+border: 1px solid #000;
+}
+.middleField{
+width: 120px;
+height: 70px;
+border: 1px solid #000;
+}
+//-->
+<!--
+A{
+  text-decoration : none;
+}
+-->
+<!--
+a:hover{color:#99ccff;}
+-->
+</style>
+<meta name="generator" content="Namo WebEditor(Trial)">
+<meta http-equiv="content-type" content="text/html; charset=utf-8"></head>
+
+<body text="#000000" bgcolor="#ffffff" link="#0099ff" vlink="#0099ff" alink="#0099ff">
+<table id="mainTable" align="center">
+<tr>
+        <td id="battleNumber" colspan="3" style="padding-bottom: 10px;">
+            <p>&nbsp;</p>
+        </td>
+</tr>
+<tr>
+<td id="leftField" onClick="if(finishFlag==0)sortList(-1);" rowspan="2">
+&nbsp;
+</td>
+<td class="middleField" onClick="if(finishFlag==0)sortList(0);">
+둘 다 좋다
+</td>
+<td id="rightField" onClick="if(finishFlag==0)sortList(1);" rowspan="2">
+</td>
+</tr>
+<tr>
+<td class="middleField" onClick="if(finishFlag==0)sortList(0);">
+못 고르겠다
+</td>
+</tr>
+</table><br><br>
+<div id="resultField" style="text-align:center;">
+    <p><font size="2" face="돋움"><span style="">@almostkittycat</font></p>
+
+</div>
+<script type="text/javascript">
+<!--
+initList();
+showImage();
+//-->
+</script>
+
+</body>
+</html>
